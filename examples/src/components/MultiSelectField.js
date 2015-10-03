@@ -1,5 +1,30 @@
 import React from 'react';
 import Select from 'react-select';
+import Promise from 'bluebird';
+
+var asyncOpt = (query) => {
+	console.log(arguments);
+
+	return new Promise((resolve, reject) => {
+		let option = [
+			{ label: 'Chocolate', value: 'chocolate' },
+			{ label: 'Vanilla', value: 'vanilla' },
+			{ label: 'Strawberry', value: 'strawberry' },
+			{ label: 'Caramel', value: 'caramel' },
+			{ label: 'Cookies and Cream', value: 'cookiescream' },
+			{ label: 'Peppermint', value: 'peppermint' }
+		];
+
+		setTimeout(() => {
+			resolve(
+				option.filter((elm) => {
+					return elm.label.indexOf(query) !== -1
+				})
+			)
+		}, 2000)
+
+	})
+};
 
 function logChange() {
 	console.log.apply(console, [].concat(['Select value changed:'], Array.prototype.slice.apply(arguments)));
@@ -24,6 +49,7 @@ var MultiSelectField = React.createClass({
 		this.setState({ 'disabled': e.target.checked });
 	},
 	render () {
+
 		var ops = [
 			{ label: 'Chocolate', value: 'chocolate' },
 			{ label: 'Vanilla', value: 'vanilla' },
@@ -35,7 +61,15 @@ var MultiSelectField = React.createClass({
 		return (
 			<div className="section">
 				<h3 className="section-heading">{this.props.label}</h3>
-				<Select multi disabled={this.state.disabled} value={this.state.value} placeholder="Select your favourite(s)" options={ops} onChange={this.handleSelectChange} />
+				<Select
+					multi
+					disabled={this.state.disabled}
+					value={this.state.value}
+					asyncOptions={asyncOpt}
+					searchingText='Testing async loading...'
+					noResultsText='Testing No results found'
+					searchPromptText='Testing enter search query'
+					onChange={this.handleSelectChange} />
 
 				<div className="checkbox-list">
 					<label className="checkbox">

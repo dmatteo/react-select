@@ -1210,14 +1210,14 @@ describe('Select', function() {
 		});
 	});
 
-	describe('with async options', function () {
+	describe.only('with async options', function () {
 
 		var asyncOptions;
 
 		beforeEach(function () {
 
-			asyncOptions = sinon.stub();
-
+			asyncOptions = sinon.spy(optionsPromise);
+/*
 			asyncOptions.withArgs('te').callsArgWith(1, null, {
 				options: [
 					{ value: 'test', label: 'TEST one' },
@@ -1232,7 +1232,7 @@ describe('Select', function() {
 					{ value: 'test2', label: 'TEST two' }
 				]
 			});
-
+*/
 
 		});
 
@@ -1262,15 +1262,19 @@ describe('Select', function() {
 				expect(asyncOptions, 'was called with', 'ab');
 			});
 
-			it('shows the returned options after asyncOptions calls back', function () {
+			it('shows the returned options after asyncOptions calls back', function (done) {
 
 				typeSearchText('te');
 
 				var optionList = React.findDOMNode(instance).querySelectorAll('.Select-menu .Select-option');
-				expect(optionList, 'to have length', 3);
-				expect(optionList[0], 'to have text', 'TEST one');
-				expect(optionList[1], 'to have text', 'TEST two');
-				expect(optionList[2], 'to have text', 'TELL three');
+				setTimeout(() => {
+					expect(optionList, 'to have length', 3);
+					expect(optionList[0], 'to have text', 'TEST one');
+					expect(optionList[1], 'to have text', 'TEST two');
+					expect(optionList[2], 'to have text', 'TELL three');
+					done();
+				}, 10)
+
 			});
 
 			it('uses the options cache when the same text is entered again', function () {
