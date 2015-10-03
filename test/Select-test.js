@@ -2651,20 +2651,16 @@ describe('Select', function() {
 			var asyncOptions;
 			var asyncOptionsCallback;
 
-			beforeEach(function () {
+			it('uses the searchingText whilst the asyncOptions are loading', function () {
 
-				asyncOptions = sinon.spy();
-
-				instance = createControl({
+				asyncOptions = sinon.spy(optionsPromise.bind(null, undefined, 10));
+				var instance = createControl({
 					asyncOptions: asyncOptions,
 					autoload: false,
 					searchingText: 'Testing async loading...',
 					noResultsText: 'Testing No results found',
 					searchPromptText: 'Testing enter search query'
 				});
-			});
-
-			it('uses the searchingText whilst the asyncOptions are loading', function () {
 
 				clickArrowToOpen();
 				expect(asyncOptions, 'was not called');
@@ -2675,7 +2671,16 @@ describe('Select', function() {
 					'to have text', 'Testing async loading...');
 			});
 
-			it('clears the searchingText when results arrive', function () {
+			it('clears the searchingText when results arrive', function (done) {
+
+				asyncOptions = sinon.spy(optionsPromise.bind(null, undefined, 10));
+				var instance = createControl({
+					asyncOptions: asyncOptions,
+					autoload: false,
+					searchingText: 'Testing async loading...',
+					noResultsText: 'Testing No results found',
+					searchPromptText: 'Testing enter search query'
+				});
 
 				clickArrowToOpen();
 				typeSearchText('abc');
@@ -2683,14 +2688,22 @@ describe('Select', function() {
 				expect(React.findDOMNode(instance), 'queried for first', '.Select-searching',
 					'to have text', 'Testing async loading...');
 
-				asyncOptions.args[0][1](null, {
-					options: [{ value: 'abc', label: 'Abc' }]
-				});
-
-				expect(React.findDOMNode(instance), 'to contain no elements matching', '.Select-noresults');
+				setTimeout(() => {
+					expect(React.findDOMNode(instance), 'to contain no elements matching', '.Select-noresults');
+					done();
+				}, 20);
 			});
 
-			it('switches the searchingText to noResultsText when options arrive, but empty', function () {
+			it('switches the searchingText to noResultsText when options arrive, but empty', function (done) {
+
+				asyncOptions = sinon.spy(optionsPromise.bind(null, [], 10));
+				var instance = createControl({
+					asyncOptions: asyncOptions,
+					autoload: false,
+					searchingText: 'Testing async loading...',
+					noResultsText: 'Testing No results found',
+					searchPromptText: 'Testing enter search query'
+				});
 
 				clickArrowToOpen();
 				typeSearchText('abc');
@@ -2699,13 +2712,13 @@ describe('Select', function() {
 					'to have text', 'Testing async loading...');
 				expect(React.findDOMNode(instance), 'to contain no elements matching', '.Select-noresults');
 
-				asyncOptions.args[0][1](null, {
-					options: []
-				});
+				setTimeout(() => {
+					expect(React.findDOMNode(instance), 'queried for first', '.Select-noresults',
+						'to have text', 'Testing No results found');
+					expect(React.findDOMNode(instance), 'to contain no elements matching', '.Select-searching');
+					done();
+				}, 20);
 
-				expect(React.findDOMNode(instance), 'queried for first', '.Select-noresults',
-					'to have text', 'Testing No results found');
-				expect(React.findDOMNode(instance), 'to contain no elements matching', '.Select-searching');
 			});
 		});
 
