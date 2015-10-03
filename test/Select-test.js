@@ -153,6 +153,20 @@ describe('Select', function() {
 		{ value: 'four', label: 'AbcDef' }
 	];
 
+	var optionsPromise = (options, timeout) => {
+		var opts = options || defaultOptions;
+
+		return new Promise((resolve, reject) => {
+			if (typeof timeout === 'number') {
+				setTimeout(() => {
+					resolve(opts)
+				}, timeout);
+			} else {
+				resolve(opts);
+			}
+		})
+	};
+
 
 	describe('with simple options', function () {
 
@@ -2727,7 +2741,7 @@ describe('Select', function() {
 
 			beforeEach(function () {
 
-				asyncOptions = sinon.stub();
+				asyncOptions = sinon.spy(optionsPromise);
 
 				instance = createControl({
 					asyncOptions: asyncOptions,
@@ -2748,8 +2762,11 @@ describe('Select', function() {
 
 			it('clears the searchPromptText when results arrive', function () {
 
-				asyncOptions.callsArgWith(1, null, {
-					options: [{ value: 'abcd', label: 'ABCD' }]
+				asyncOptions = sinon.spy(optionsPromise.bind(null, undefined, 10));
+				var instance = createControl({
+					asyncOptions: asyncOptions,
+					autoload: false,
+					searchPromptText: 'Unit test prompt text'
 				});
 
 				var selectArrow = React.findDOMNode(instance).querySelector('.Select-arrow');
@@ -2758,8 +2775,11 @@ describe('Select', function() {
 				typeSearchText('abc');
 				expect(asyncOptions, 'was called once');
 
-				expect(React.findDOMNode(instance), 'to contain no elements matching', '.Select-prompt');
-				expect(React.findDOMNode(instance), 'to contain no elements matching', '.Select-noresults');
+				setTimeout(() => {
+					expect(React.findDOMNode(instance), 'to contain no elements matching', '.Select-prompt');
+					expect(React.findDOMNode(instance), 'to contain no elements matching', '.Select-noresults');
+				}, 20);
+
 			});
 		});
 
