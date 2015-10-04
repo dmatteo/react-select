@@ -569,7 +569,7 @@ var Select = React.createClass({
 			}
 		}
 
-		this.props.asyncOptions(input, (err, data) => {
+		var asyncOpts = this.props.asyncOptions(input, (err, data) => {
 			if (err) throw err;
 			if (this.props.cacheAsyncResults) {
 				this._optionsCache[input] = data;
@@ -589,10 +589,37 @@ var Select = React.createClass({
 				}
 			}
 			this.setState(newState);
-			if (callback) {
-				callback.call(this, newState);
-			}
+			if (callback) callback.call(this, newState);
 		});
+
+		if (asyncOpts && typeof asyncOpts.then === 'function') {
+			this.props.asyncOptions(input).then((data) => {
+				if (this.props.cacheAsyncResults) {
+					this._optionsCache[input] = data;
+				}
+
+				if (thisRequestId !== this._currentRequestId) {
+					return;
+				}
+				var filteredOptions = this.filterOptions(data.options);
+				var newState = {
+					options: data.options,
+					filteredOptions: filteredOptions,
+					focusedOption: this._getNewFocusedOption(filteredOptions)
+				};
+				for (var key in state) {
+					if (state.hasOwnProperty(key)) {
+						newState[key] = state[key];
+					}
+				}
+				this.setState(newState);
+				if (callback) {
+					callback.call(this, newState);
+				}
+			}, (err) => {
+				throw (err);
+			});
+		}
 	},
 
 	filterOptions (options, values) {
