@@ -29,18 +29,7 @@ function logChange() {
 
 React.render(
 	<div>
-		<StatesField label="States" searchable />
 		<MultiSelectField label="Multiselect"/>
-		<UsersField label="Users (custom options/value)" hint="This example uses Gravatar to render user's image besides the value and the options" />
-		<ValuesAsNumbersField label="Values as numbers" />
-		<CustomKeysField label="Custom object keys for options" />
-		<SelectedValuesField label="Clickable labels (labels as links)" options={FLAVOURS} hint="Open the console to see click behaviour (data/event)" />
-		<SelectedValuesField label="Disabled option" options={FLAVOURS_WITH_DISABLED_OPTION} hint="You savage! Caramel is the best..." />
-		<DisabledUpsellOptions label="Disabled option with a link"/>
-		<SelectedValuesField label="Option Creation (tags mode)" options={FLAVOURS} allowCreate hint="Enter a value that's not in the list, then hit enter" />
-		<CustomRenderField label="Custom render options/values" />
-		<CustomRenderField label="Custom render options/values (multi)" multi delimiter="," />
-		<RemoteSelectField label="Remote Options" hint='Type anything in the remote example to asynchronously load options. Valid alternative results are "A", "AA", and "AB"' />
 	</div>,
 	document.getElementById('example')
 );
