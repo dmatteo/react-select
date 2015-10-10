@@ -1375,6 +1375,107 @@ describe('Select', () => {
 		});
 	});
 
+	describe('with async options (using promises)', () => {
+
+		var asyncOptions, callCount, callInput;
+
+		beforeEach(() => {
+
+			callCount = 0;
+			callInput = '';
+
+			asyncOptions = (input) => {
+				callCount += 1;
+				callInput = input;
+
+			  const options = [
+					{ value: 'test', label: 'TEST one' },
+					{ value: 'test2', label: 'TEST two' },
+					{ value: 'tell', label: 'TELL three' }
+				].filter((elm) => {
+				  return (elm.value.indexOf(input) !== -1 || elm.label.indexOf(input) !== -1);
+				});
+
+				return new Promise((resolve) => {
+					resolve({options: options});
+				})
+			};
+		});
+
+		describe('with autoload=true', () => {
+
+			beforeEach(() => {
+
+				// Render an instance of the component
+				wrapper = createControlWithWrapper({
+					value: '',
+					asyncOptions: asyncOptions,
+					autoload: true
+				});
+			});
+
+			it('should be called once at the beginning', () => {
+				expect(callCount, 'to be', 1);
+			});
+
+			it('should fulfill asyncOptions promise', () => {
+				return expect(instance.props.asyncOptions(''), 'to be fulfilled');
+			});
+
+			it('should fulfill with 3 options when asyncOptions promise when input = "te"', () => {
+				return expect(instance.props.asyncOptions('te'), 'to be fulfilled with', {
+					options: [
+						{ value: 'test', label: 'TEST one' },
+						{ value: 'test2', label: 'TEST two' },
+						{ value: 'tell', label: 'TELL three' }
+					]
+				});
+			});
+
+			it('should fulfill with 2 options when asyncOptions promise when input = "tes"', () => {
+				return expect(instance.props.asyncOptions('tes'), 'to be fulfilled with', {
+					options: [
+						{ value: 'test', label: 'TEST one' },
+						{ value: 'test2', label: 'TEST two' }
+					]
+				});
+			});
+
+			it('calls the asyncOptions again when the input changes', () => {
+
+				typeSearchText('ab');
+
+				expect(callCount, 'to be', 2);
+				expect(callInput, 'to be', 'ab');
+			});
+
+		});
+
+		describe('with autoload=false', () => {
+
+			beforeEach(() => {
+
+				// Render an instance of the component
+				instance = createControl({
+					value: '',
+					asyncOptions: asyncOptions,
+					autoload: false
+				});
+			});
+
+			it('does not initially call asyncOptions', () => {
+				expect(callCount, 'to be', 0);
+			});
+
+			it('calls the asyncOptions on first key entry', () => {
+
+				typeSearchText('a');
+				expect(callCount, 'to be', 1);
+				expect(callInput, 'to be', 'a');
+			});
+		});
+	});
+
 	describe('with multi-select', () => {
 
 		beforeEach(() => {
