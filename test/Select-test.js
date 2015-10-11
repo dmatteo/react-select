@@ -1381,13 +1381,7 @@ describe('Select', () => {
 
 		beforeEach(() => {
 
-			callCount = 0;
-			callInput = '';
-
-			asyncOptions = (input) => {
-				callCount += 1;
-				callInput = input;
-
+			asyncOptions = sinon.spy((input) => {
 			  const options = [
 					{ value: 'test', label: 'TEST one' },
 					{ value: 'test2', label: 'TEST two' },
@@ -1399,10 +1393,10 @@ describe('Select', () => {
 				return new Promise((resolve) => {
 					resolve({options: options});
 				})
-			};
+			});
 		});
 
-		describe('with autoload=true', () => {
+		describe('[mocked promise]', () => {
 
 			beforeEach(() => {
 
@@ -1412,10 +1406,6 @@ describe('Select', () => {
 					asyncOptions: asyncOptions,
 					autoload: true
 				});
-			});
-
-			it('should be called once at the beginning', () => {
-				expect(callCount, 'to be', 1);
 			});
 
 			it('should fulfill asyncOptions promise', () => {
@@ -1440,13 +1430,30 @@ describe('Select', () => {
 					]
 				});
 			});
+		});
+
+		describe('with autoload=true', () => {
+
+			beforeEach(() => {
+
+				// Render an instance of the component
+				wrapper = createControlWithWrapper({
+					value: '',
+					asyncOptions: asyncOptions,
+					autoload: true
+				});
+			});
+
+			it('should be called once at the beginning', () => {
+				expect(asyncOptions, 'was called');
+			});
 
 			it('calls the asyncOptions again when the input changes', () => {
 
 				typeSearchText('ab');
 
-				expect(callCount, 'to be', 2);
-				expect(callInput, 'to be', 'ab');
+				expect(asyncOptions, 'was called twice');
+				expect(asyncOptions, 'was called with', 'ab');
 			});
 
 		});
@@ -1464,14 +1471,14 @@ describe('Select', () => {
 			});
 
 			it('does not initially call asyncOptions', () => {
-				expect(callCount, 'to be', 0);
+				expect(asyncOptions, 'was not called');
 			});
 
 			it('calls the asyncOptions on first key entry', () => {
 
 				typeSearchText('a');
-				expect(callCount, 'to be', 1);
-				expect(callInput, 'to be', 'a');
+				expect(asyncOptions, 'was called once');
+				expect(asyncOptions, 'was called with', 'a');
 			});
 		});
 	});
