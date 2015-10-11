@@ -1390,8 +1390,8 @@ describe('Select', () => {
 				  return (elm.value.indexOf(input) !== -1 || elm.label.indexOf(input) !== -1);
 				});
 
-				return new Promise((resolve) => {
-					resolve({options: options});
+				return new Promise((resolve, reject) => {
+					input === '_FAIL'? reject('nope') : resolve({options: options});
 				})
 			});
 		});
@@ -1429,6 +1429,10 @@ describe('Select', () => {
 						{ value: 'test2', label: 'TEST two' }
 					]
 				});
+			});
+
+			it('should reject when asyncOptions promise with input = "_FAIL"', () => {
+				return expect(instance.props.asyncOptions('_FAIL'), 'to be rejected');
 			});
 		});
 
