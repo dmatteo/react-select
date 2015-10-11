@@ -1412,7 +1412,7 @@ describe('Select', () => {
 				return expect(instance.props.asyncOptions(''), 'to be fulfilled');
 			});
 
-			it('should fulfill with 3 options when asyncOptions promise when input = "te"', () => {
+			it('should fulfill with 3 options when asyncOptions promise with input = "te"', () => {
 				return expect(instance.props.asyncOptions('te'), 'to be fulfilled with', {
 					options: [
 						{ value: 'test', label: 'TEST one' },
@@ -1422,7 +1422,7 @@ describe('Select', () => {
 				});
 			});
 
-			it('should fulfill with 2 options when asyncOptions promise when input = "tes"', () => {
+			it('should fulfill with 2 options when asyncOptions promise with input = "tes"', () => {
 				return expect(instance.props.asyncOptions('tes'), 'to be fulfilled with', {
 					options: [
 						{ value: 'test', label: 'TEST one' },
