@@ -1456,6 +1456,24 @@ describe('Select', () => {
 				expect(asyncOptions, 'was called with', 'ab');
 			});
 
+			it('shows the returned options after asyncOptions promise resolves', (done) => {
+
+				typeSearchText('te');
+
+				return asyncOptions.firstCall.returnValue.then(() => {
+					setTimeout(() => {
+						expect(ReactDOM.findDOMNode(instance), 'queried for', '.Select-option',
+							'to satisfy', [
+								expect.it('to have text', 'TEST one'),
+								expect.it('to have text', 'TEST two'),
+								expect.it('to have text', 'TELL three')
+							]);
+						done();
+					});
+				});
+
+			});
+
 		});
 
 		describe('with autoload=false', () => {
