@@ -1478,6 +1478,42 @@ describe('Select', () => {
 
 			});
 
+			it('doesn\'t update the returned options when asyncOptions is rejected', (done) => {
+
+				typeSearchText('te');
+				expect(asyncOptions, 'was called with', 'te');
+
+				asyncOptions.secondCall.returnValue.then(() => {
+					setTimeout(() => {
+						expect(ReactDOM.findDOMNode(instance), 'queried for', '.Select-option',
+							'to satisfy', [
+								expect.it('to have text', 'TEST one'),
+								expect.it('to have text', 'TEST two'),
+								expect.it('to have text', 'TELL three')
+							]);
+
+						// asyncOptions mock is set to reject the promise when invoked with '_FAIL'
+						typeSearchText('_FAIL');
+						expect(asyncOptions, 'was called with', '_FAIL');
+
+						asyncOptions.thirdCall.returnValue.then(null, () => {
+							setTimeout(() => {
+								expect(ReactDOM.findDOMNode(instance), 'queried for', '.Select-option',
+									'to satisfy', [
+										expect.it('to have text', 'TEST one'),
+										expect.it('to have text', 'TEST two'),
+										expect.it('to have text', 'TELL three')
+									]);
+
+								done();
+							});
+
+						});
+					});
+
+				});
+			});
+
 		});
 
 		describe('with autoload=false', () => {
