@@ -1464,7 +1464,7 @@ describe('Select', () => {
 
 				typeSearchText('te');
 
-				return asyncOptions.firstCall.returnValue.then(() => {
+				return asyncOptions.secondCall.returnValue.then(() => {
 					setTimeout(() => {
 						expect(ReactDOM.findDOMNode(instance), 'queried for', '.Select-option',
 							'to satisfy', [
