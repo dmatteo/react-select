@@ -1460,7 +1460,7 @@ describe('Select', () => {
 				expect(asyncOptions, 'was called with', 'ab');
 			});
 
-			it('shows the returned options after asyncOptions promise resolves', (done) => {
+			it('shows the returned options after asyncOptions promise is resolved', (done) => {
 
 				typeSearchText('te');
 
