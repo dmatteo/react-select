@@ -1,4 +1,753 @@
 require=(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+/* eslint react/prop-types: 0 */
+
+'use strict';
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+var _react = require('react');
+
+var _react2 = _interopRequireDefault(_react);
+
+var _reactDom = require('react-dom');
+
+var _reactDom2 = _interopRequireDefault(_reactDom);
+
+var _reactSelect = require('react-select');
+
+var _reactSelect2 = _interopRequireDefault(_reactSelect);
+
+var _componentsContributors = require('./components/Contributors');
+
+var _componentsContributors2 = _interopRequireDefault(_componentsContributors);
+
+var _componentsCustomComponents = require('./components/CustomComponents');
+
+var _componentsCustomComponents2 = _interopRequireDefault(_componentsCustomComponents);
+
+var _componentsCustomRender = require('./components/CustomRender');
+
+var _componentsCustomRender2 = _interopRequireDefault(_componentsCustomRender);
+
+var _componentsMultiselect = require('./components/Multiselect');
+
+var _componentsMultiselect2 = _interopRequireDefault(_componentsMultiselect);
+
+var _componentsNumericSelect = require('./components/NumericSelect');
+
+var _componentsNumericSelect2 = _interopRequireDefault(_componentsNumericSelect);
+
+var _componentsStates = require('./components/States');
+
+var _componentsStates2 = _interopRequireDefault(_componentsStates);
+
+_reactDom2['default'].render(_react2['default'].createElement(
+	'div',
+	null,
+	_react2['default'].createElement(_componentsMultiselect2['default'], { label: 'Multiselect' })
+), document.getElementById('example'));
+
+},{"./components/Contributors":2,"./components/CustomComponents":3,"./components/CustomRender":4,"./components/Multiselect":5,"./components/NumericSelect":6,"./components/States":7,"react":undefined,"react-dom":undefined,"react-select":undefined}],2:[function(require,module,exports){
+'use strict';
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+var _react = require('react');
+
+var _react2 = _interopRequireDefault(_react);
+
+var _reactSelect = require('react-select');
+
+var _reactSelect2 = _interopRequireDefault(_reactSelect);
+
+var CONTRIBUTORS = require('../data/contributors');
+var MAX_CONTRIBUTORS = 6;
+var ASYNC_DELAY = 500;
+
+var Contributors = _react2['default'].createClass({
+	displayName: 'Contributors',
+	propTypes: {
+		label: _react2['default'].PropTypes.string
+	},
+	getInitialState: function getInitialState() {
+		return {
+			multi: true,
+			value: [CONTRIBUTORS[0]]
+		};
+	},
+	onChange: function onChange(value) {
+		this.setState({
+			value: value
+		});
+	},
+	switchToMulti: function switchToMulti() {
+		this.setState({
+			multi: true,
+			value: [this.state.value]
+		});
+	},
+	switchToSingle: function switchToSingle() {
+		this.setState({
+			multi: false,
+			value: this.state.value[0]
+		});
+	},
+	getContributors: function getContributors(input, callback) {
+		input = input.toLowerCase();
+		var options = CONTRIBUTORS.filter(function (i) {
+			return i.github.substr(0, input.length) === input;
+		});
+		var data = {
+			options: options.slice(0, MAX_CONTRIBUTORS),
+			complete: options.length <= MAX_CONTRIBUTORS
+		};
+		setTimeout(function () {
+			callback(null, data);
+		}, ASYNC_DELAY);
+	},
+	gotoContributor: function gotoContributor(value, event) {
+		window.open('https://github.com/' + value.github);
+	},
+	render: function render() {
+		return _react2['default'].createElement(
+			'div',
+			{ className: 'section' },
+			_react2['default'].createElement(
+				'h3',
+				{ className: 'section-heading' },
+				this.props.label
+			),
+			_react2['default'].createElement(_reactSelect2['default'].Async, { multi: this.state.multi, value: this.state.value, onChange: this.onChange, onValueClick: this.gotoContributor, valueKey: 'github', labelKey: 'name', loadOptions: this.getContributors }),
+			_react2['default'].createElement(
+				'div',
+				{ className: 'checkbox-list' },
+				_react2['default'].createElement(
+					'label',
+					{ className: 'checkbox' },
+					_react2['default'].createElement('input', { type: 'radio', className: 'checkbox-control', checked: this.state.multi, onChange: this.switchToMulti }),
+					_react2['default'].createElement(
+						'span',
+						{ className: 'checkbox-label' },
+						'Multiselect'
+					)
+				),
+				_react2['default'].createElement(
+					'label',
+					{ className: 'checkbox' },
+					_react2['default'].createElement('input', { type: 'radio', className: 'checkbox-control', checked: !this.state.multi, onChange: this.switchToSingle }),
+					_react2['default'].createElement(
+						'span',
+						{ className: 'checkbox-label' },
+						'Single Value'
+					)
+				)
+			),
+			_react2['default'].createElement(
+				'div',
+				{ className: 'hint' },
+				'This example implements custom label and value properties, async options and opens the github profiles in a new window when values are clicked'
+			)
+		);
+	}
+});
+
+module.exports = Contributors;
+
+},{"../data/contributors":8,"react":undefined,"react-select":undefined}],3:[function(require,module,exports){
+'use strict';
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+var _react = require('react');
+
+var _react2 = _interopRequireDefault(_react);
+
+var _reactSelect = require('react-select');
+
+var _reactSelect2 = _interopRequireDefault(_reactSelect);
+
+var _reactGravatar = require('react-gravatar');
+
+var _reactGravatar2 = _interopRequireDefault(_reactGravatar);
+
+var USERS = require('../data/users');
+var GRAVATAR_SIZE = 15;
+
+var GravatarOption = _react2['default'].createClass({
+	displayName: 'GravatarOption',
+
+	propTypes: {
+		className: _react2['default'].PropTypes.string,
+		isDisabled: _react2['default'].PropTypes.bool,
+		isFocused: _react2['default'].PropTypes.bool,
+		isSelected: _react2['default'].PropTypes.bool,
+		onSelect: _react2['default'].PropTypes.func,
+		onFocus: _react2['default'].PropTypes.func,
+		onUnfocus: _react2['default'].PropTypes.func,
+		option: _react2['default'].PropTypes.object.isRequired
+	},
+	handleMouseDown: function handleMouseDown(event) {
+		event.preventDefault();
+		event.stopPropagation();
+		this.props.onSelect(this.props.option, event);
+	},
+	handleMouseEnter: function handleMouseEnter(event) {
+		this.props.onFocus(this.props.option, event);
+	},
+	handleMouseMove: function handleMouseMove(event) {
+		if (this.props.focused) return;
+		this.props.onFocus(this.props.option, event);
+	},
+	handleMouseLeave: function handleMouseLeave(event) {
+		this.props.onUnfocus(this.props.option, event);
+	},
+	render: function render() {
+		var gravatarStyle = {
+			borderRadius: 3,
+			display: 'inline-block',
+			marginRight: 10,
+			position: 'relative',
+			top: -2,
+			verticalAlign: 'middle'
+		};
+		return _react2['default'].createElement(
+			'div',
+			{ className: this.props.className,
+				onMouseDown: this.handleMouseDown,
+				onMouseEnter: this.handleMouseEnter,
+				onMouseMove: this.handleMouseMove,
+				onMouseLeave: this.handleMouseLeave,
+				title: this.props.option.title },
+			_react2['default'].createElement(_reactGravatar2['default'], { email: this.props.option.email, size: GRAVATAR_SIZE, style: gravatarStyle }),
+			this.props.children
+		);
+	}
+});
+
+var GravatarValue = _react2['default'].createClass({
+	displayName: 'GravatarValue',
+
+	propTypes: {
+		placeholder: _react2['default'].PropTypes.string,
+		value: _react2['default'].PropTypes.object
+	},
+	render: function render() {
+		var gravatarStyle = {
+			borderRadius: 3,
+			display: 'inline-block',
+			marginRight: 10,
+			position: 'relative',
+			top: -2,
+			verticalAlign: 'middle'
+		};
+		return _react2['default'].createElement(
+			'div',
+			{ className: 'Select-value', title: this.props.value.title },
+			_react2['default'].createElement(
+				'span',
+				{ className: 'Select-value-label' },
+				_react2['default'].createElement(_reactGravatar2['default'], { email: this.props.value.email, size: GRAVATAR_SIZE, style: gravatarStyle }),
+				this.props.children
+			)
+		);
+	}
+});
+
+var UsersField = _react2['default'].createClass({
+	displayName: 'UsersField',
+
+	propTypes: {
+		hint: _react2['default'].PropTypes.string,
+		label: _react2['default'].PropTypes.string
+	},
+	getInitialState: function getInitialState() {
+		return {};
+	},
+	setValue: function setValue(value) {
+		this.setState({ value: value });
+	},
+	render: function render() {
+		var placeholder = _react2['default'].createElement(
+			'span',
+			null,
+			'☺ Select User'
+		);
+
+		return _react2['default'].createElement(
+			'div',
+			{ className: 'section' },
+			_react2['default'].createElement(
+				'h3',
+				{ className: 'section-heading' },
+				this.props.label
+			),
+			_react2['default'].createElement(_reactSelect2['default'], {
+				onChange: this.setValue,
+				optionComponent: GravatarOption,
+				options: USERS,
+				placeholder: placeholder,
+				value: this.state.value,
+				valueComponent: GravatarValue
+			}),
+			_react2['default'].createElement(
+				'div',
+				{ className: 'hint' },
+				'This example implements custom Option and Value components to render a Gravatar image for each user based on their email. It also demonstrates rendering HTML elements as the placeholder.'
+			)
+		);
+	}
+});
+
+module.exports = UsersField;
+
+},{"../data/users":10,"react":undefined,"react-gravatar":14,"react-select":undefined}],4:[function(require,module,exports){
+'use strict';
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+var _react = require('react');
+
+var _react2 = _interopRequireDefault(_react);
+
+var _reactSelect = require('react-select');
+
+var _reactSelect2 = _interopRequireDefault(_reactSelect);
+
+var DisabledUpsellOptions = _react2['default'].createClass({
+	displayName: 'DisabledUpsellOptions',
+	propTypes: {
+		label: _react2['default'].PropTypes.string
+	},
+	getInitialState: function getInitialState() {
+		return {};
+	},
+	setValue: function setValue(value) {
+		this.setState({ value: value });
+		console.log('Support level selected:', value.label);
+	},
+	renderLink: function renderLink() {
+		return _react2['default'].createElement(
+			'a',
+			{ style: { marginLeft: 5 }, href: '/upgrade', target: '_blank' },
+			'Upgrade here!'
+		);
+	},
+	renderOption: function renderOption(option) {
+		return _react2['default'].createElement(
+			'span',
+			{ style: { color: option.color } },
+			option.label,
+			' ',
+			option.link
+		);
+	},
+	renderValue: function renderValue(option) {
+		return _react2['default'].createElement(
+			'strong',
+			{ style: { color: option.color } },
+			option.label
+		);
+	},
+	render: function render() {
+		var options = [{ label: 'Basic customer support', value: 'basic', color: '#E31864' }, { label: 'Premium customer support', value: 'premium', color: '#6216A3' }, { label: 'Pro customer support', value: 'pro', disabled: true, link: this.renderLink() }];
+		return _react2['default'].createElement(
+			'div',
+			{ className: 'section' },
+			_react2['default'].createElement(
+				'h3',
+				{ className: 'section-heading' },
+				this.props.label
+			),
+			_react2['default'].createElement(_reactSelect2['default'], {
+				placeholder: 'Select your support level',
+				options: options,
+				optionRenderer: this.renderOption,
+				onChange: this.setValue,
+				value: this.state.value,
+				valueRenderer: this.renderValue
+			}),
+			_react2['default'].createElement(
+				'div',
+				{ className: 'hint' },
+				'This demonstates custom render methods and links in disabled options'
+			)
+		);
+	}
+});
+module.exports = DisabledUpsellOptions;
+
+},{"react":undefined,"react-select":undefined}],5:[function(require,module,exports){
+'use strict';
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+var _react = require('react');
+
+var _react2 = _interopRequireDefault(_react);
+
+var _reactSelect = require('react-select');
+
+var _reactSelect2 = _interopRequireDefault(_reactSelect);
+
+var FLAVOURS = [{ label: 'Chocolate', value: 'chocolate' }, { label: 'Vanilla', value: 'vanilla' }, { label: 'Strawberry', value: 'strawberry' }, { label: 'Caramel', value: 'caramel' }, { label: 'Cookies and Cream', value: 'cookiescream' }, { label: 'Peppermint', value: 'peppermint' }];
+
+var WHY_WOULD_YOU = [{ label: 'Chocolate (are you crazy?)', value: 'chocolate', disabled: true }].concat(FLAVOURS.slice(1));
+
+var MultiSelectField = _react2['default'].createClass({
+	displayName: 'MultiSelectField',
+	propTypes: {
+		label: _react2['default'].PropTypes.string
+	},
+	getInitialState: function getInitialState() {
+		return {
+			disabled: false,
+			crazy: false,
+			options: FLAVOURS,
+			value: []
+		};
+	},
+	handleSelectChange: function handleSelectChange(value) {
+		console.log('You\'ve selected:', value);
+		this.setState({ value: value });
+	},
+	toggleDisabled: function toggleDisabled(e) {
+		this.setState({ disabled: e.target.checked });
+	},
+	toggleChocolate: function toggleChocolate(e) {
+		var crazy = e.target.checked;
+		this.setState({
+			crazy: crazy,
+			options: crazy ? WHY_WOULD_YOU : FLAVOURS
+		});
+	},
+	render: function render() {
+		return _react2['default'].createElement(
+			'div',
+			{ className: 'section' },
+			_react2['default'].createElement(
+				'h3',
+				{ className: 'section-heading' },
+				this.props.label
+			),
+			_react2['default'].createElement(_reactSelect2['default'], { multi: true, simpleValue: true, disabled: this.state.disabled, value: this.state.value, placeholder: 'Select your favourite(s)', options: this.state.options, onChange: this.handleSelectChange }),
+			_react2['default'].createElement(
+				'div',
+				{ className: 'checkbox-list' },
+				_react2['default'].createElement(
+					'label',
+					{ className: 'checkbox' },
+					_react2['default'].createElement('input', { type: 'checkbox', className: 'checkbox-control', checked: this.state.disabled, onChange: this.toggleDisabled }),
+					_react2['default'].createElement(
+						'span',
+						{ className: 'checkbox-label' },
+						'Disable the control'
+					)
+				),
+				_react2['default'].createElement(
+					'label',
+					{ className: 'checkbox' },
+					_react2['default'].createElement('input', { type: 'checkbox', className: 'checkbox-control', checked: this.state.crazy, onChange: this.toggleChocolate }),
+					_react2['default'].createElement(
+						'span',
+						{ className: 'checkbox-label' },
+						'I don\'t like Chocolate (disabled the option)'
+					)
+				)
+			)
+		);
+	}
+});
+
+module.exports = MultiSelectField;
+
+},{"react":undefined,"react-select":undefined}],6:[function(require,module,exports){
+'use strict';
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+var _react = require('react');
+
+var _react2 = _interopRequireDefault(_react);
+
+var _reactSelect = require('react-select');
+
+var _reactSelect2 = _interopRequireDefault(_reactSelect);
+
+var ValuesAsNumbersField = _react2['default'].createClass({
+	displayName: 'ValuesAsNumbersField',
+	propTypes: {
+		label: _react2['default'].PropTypes.string
+	},
+	getInitialState: function getInitialState() {
+		return {
+			options: [{ value: 10, label: 'Ten' }, { value: 11, label: 'Eleven' }, { value: 12, label: 'Twelve' }, { value: 23, label: 'Twenty-three' }, { value: 24, label: 'Twenty-four' }],
+			matchPos: 'any',
+			matchValue: true,
+			matchLabel: true,
+			value: null,
+			multi: false
+		};
+	},
+	onChangeMatchStart: function onChangeMatchStart(event) {
+		this.setState({
+			matchPos: event.target.checked ? 'start' : 'any'
+		});
+	},
+	onChangeMatchValue: function onChangeMatchValue(event) {
+		this.setState({
+			matchValue: event.target.checked
+		});
+	},
+	onChangeMatchLabel: function onChangeMatchLabel(event) {
+		this.setState({
+			matchLabel: event.target.checked
+		});
+	},
+	onChange: function onChange(value) {
+		this.setState({ value: value });
+		console.log('Numeric Select value changed to', value);
+	},
+	onChangeMulti: function onChangeMulti(event) {
+		this.setState({
+			multi: event.target.checked
+		});
+	},
+	render: function render() {
+		var matchProp = 'any';
+		if (this.state.matchLabel && !this.state.matchValue) {
+			matchProp = 'label';
+		}
+		if (!this.state.matchLabel && this.state.matchValue) {
+			matchProp = 'value';
+		}
+		return _react2['default'].createElement(
+			'div',
+			{ className: 'section' },
+			_react2['default'].createElement(
+				'h3',
+				{ className: 'section-heading' },
+				this.props.label
+			),
+			_react2['default'].createElement(_reactSelect2['default'], {
+				matchPos: this.state.matchPos,
+				matchProp: matchProp,
+				multi: this.state.multi,
+				onChange: this.onChange,
+				options: this.state.options,
+				simpleValue: true,
+				value: this.state.value
+			}),
+			_react2['default'].createElement(
+				'div',
+				{ className: 'checkbox-list' },
+				_react2['default'].createElement(
+					'label',
+					{ className: 'checkbox' },
+					_react2['default'].createElement('input', { type: 'checkbox', className: 'checkbox-control', checked: this.state.multi, onChange: this.onChangeMulti }),
+					_react2['default'].createElement(
+						'span',
+						{ className: 'checkbox-label' },
+						'Multi-Select'
+					)
+				),
+				_react2['default'].createElement(
+					'label',
+					{ className: 'checkbox' },
+					_react2['default'].createElement('input', { type: 'checkbox', className: 'checkbox-control', checked: this.state.matchValue, onChange: this.onChangeMatchValue }),
+					_react2['default'].createElement(
+						'span',
+						{ className: 'checkbox-label' },
+						'Match value only'
+					)
+				),
+				_react2['default'].createElement(
+					'label',
+					{ className: 'checkbox' },
+					_react2['default'].createElement('input', { type: 'checkbox', className: 'checkbox-control', checked: this.state.matchLabel, onChange: this.onChangeMatchLabel }),
+					_react2['default'].createElement(
+						'span',
+						{ className: 'checkbox-label' },
+						'Match label only'
+					)
+				),
+				_react2['default'].createElement(
+					'label',
+					{ className: 'checkbox' },
+					_react2['default'].createElement('input', { type: 'checkbox', className: 'checkbox-control', checked: this.state.matchPos === 'start', onChange: this.onChangeMatchStart }),
+					_react2['default'].createElement(
+						'span',
+						{ className: 'checkbox-label' },
+						'Only include matches from the start of the string'
+					)
+				)
+			),
+			_react2['default'].createElement(
+				'div',
+				{ className: 'hint' },
+				'This example uses simple numeric values'
+			)
+		);
+	}
+});
+
+module.exports = ValuesAsNumbersField;
+
+},{"react":undefined,"react-select":undefined}],7:[function(require,module,exports){
+'use strict';
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+var _react = require('react');
+
+var _react2 = _interopRequireDefault(_react);
+
+var _reactSelect = require('react-select');
+
+var _reactSelect2 = _interopRequireDefault(_reactSelect);
+
+var STATES = require('../data/states');
+
+var StatesField = _react2['default'].createClass({
+	displayName: 'StatesField',
+	propTypes: {
+		label: _react2['default'].PropTypes.string,
+		searchable: _react2['default'].PropTypes.bool
+	},
+	getDefaultProps: function getDefaultProps() {
+		return {
+			label: 'States:',
+			searchable: true
+		};
+	},
+	getInitialState: function getInitialState() {
+		return {
+			country: 'AU',
+			disabled: false,
+			searchable: this.props.searchable,
+			selectValue: 'new-south-wales',
+			clearable: true
+		};
+	},
+	switchCountry: function switchCountry(e) {
+		var newCountry = e.target.value;
+		console.log('Country changed to ' + newCountry);
+		this.setState({
+			country: newCountry,
+			selectValue: null
+		});
+	},
+	updateValue: function updateValue(newValue) {
+		console.log('State changed to ' + newValue);
+		this.setState({
+			selectValue: newValue
+		});
+	},
+	focusStateSelect: function focusStateSelect() {
+		this.refs.stateSelect.focus();
+	},
+	toggleCheckbox: function toggleCheckbox(e) {
+		var newState = {};
+		newState[e.target.name] = e.target.checked;
+		this.setState(newState);
+	},
+	render: function render() {
+		var options = STATES[this.state.country];
+		return _react2['default'].createElement(
+			'div',
+			{ className: 'section' },
+			_react2['default'].createElement(
+				'h3',
+				{ className: 'section-heading' },
+				this.props.label
+			),
+			_react2['default'].createElement(_reactSelect2['default'], { ref: 'stateSelect', autofocus: true, options: options, simpleValue: true, clearable: this.state.clearable, name: 'selected-state', disabled: this.state.disabled, value: this.state.selectValue, onChange: this.updateValue, searchable: this.state.searchable }),
+			_react2['default'].createElement(
+				'div',
+				{ style: { marginTop: 14 } },
+				_react2['default'].createElement(
+					'button',
+					{ type: 'button', onClick: this.focusStateSelect },
+					'Focus Select'
+				),
+				_react2['default'].createElement(
+					'label',
+					{ className: 'checkbox', style: { marginLeft: 10 } },
+					_react2['default'].createElement('input', { type: 'checkbox', className: 'checkbox-control', name: 'searchable', checked: this.state.searchable, onChange: this.toggleCheckbox }),
+					_react2['default'].createElement(
+						'span',
+						{ className: 'checkbox-label' },
+						'Searchable'
+					)
+				),
+				_react2['default'].createElement(
+					'label',
+					{ className: 'checkbox', style: { marginLeft: 10 } },
+					_react2['default'].createElement('input', { type: 'checkbox', className: 'checkbox-control', name: 'disabled', checked: this.state.disabled, onChange: this.toggleCheckbox }),
+					_react2['default'].createElement(
+						'span',
+						{ className: 'checkbox-label' },
+						'Disabled'
+					)
+				),
+				_react2['default'].createElement(
+					'label',
+					{ className: 'checkbox', style: { marginLeft: 10 } },
+					_react2['default'].createElement('input', { type: 'checkbox', className: 'checkbox-control', name: 'clearable', checked: this.state.clearable, onChange: this.toggleCheckbox }),
+					_react2['default'].createElement(
+						'span',
+						{ className: 'checkbox-label' },
+						'Clearable'
+					)
+				)
+			),
+			_react2['default'].createElement(
+				'div',
+				{ className: 'checkbox-list' },
+				_react2['default'].createElement(
+					'label',
+					{ className: 'checkbox' },
+					_react2['default'].createElement('input', { type: 'radio', className: 'checkbox-control', checked: this.state.country === 'AU', value: 'AU', onChange: this.switchCountry }),
+					_react2['default'].createElement(
+						'span',
+						{ className: 'checkbox-label' },
+						'Australia'
+					)
+				),
+				_react2['default'].createElement(
+					'label',
+					{ className: 'checkbox' },
+					_react2['default'].createElement('input', { type: 'radio', className: 'checkbox-control', checked: this.state.country === 'US', value: 'US', onChange: this.switchCountry }),
+					_react2['default'].createElement(
+						'span',
+						{ className: 'checkbox-label' },
+						'United States'
+					)
+				)
+			)
+		);
+	}
+});
+
+module.exports = StatesField;
+
+},{"../data/states":9,"react":undefined,"react-select":undefined}],8:[function(require,module,exports){
+'use strict';
+
+module.exports = [{ github: 'jedwatson', name: 'Jed Watson' }, { github: 'bruderstein', name: 'Dave Brotherstone' }, { github: 'jossmac', name: 'Joss Mackison' }, { github: 'jniechcial', name: 'Jakub Niechciał' }, { github: 'craigdallimore', name: 'Craig Dallimore' }, { github: 'julen', name: 'Julen Ruiz Aizpuru' }, { github: 'dcousens', name: 'Daniel Cousens' }, { github: 'jgautsch', name: 'Jon Gautsch' }, { github: 'dmitry-smirnov', name: 'Dmitry Smirnov' }];
+
+},{}],9:[function(require,module,exports){
+'use strict';
+
+exports.AU = [{ value: 'australian-capital-territory', label: 'Australian Capital Territory', className: 'State-ACT' }, { value: 'new-south-wales', label: 'New South Wales', className: 'State-NSW' }, { value: 'victoria', label: 'Victoria', className: 'State-Vic' }, { value: 'queensland', label: 'Queensland', className: 'State-Qld' }, { value: 'western-australia', label: 'Western Australia', className: 'State-WA' }, { value: 'south-australia', label: 'South Australia', className: 'State-SA' }, { value: 'tasmania', label: 'Tasmania', className: 'State-Tas' }, { value: 'northern-territory', label: 'Northern Territory', className: 'State-NT' }];
+
+exports.US = [{ value: 'AL', label: 'Alabama', disabled: true }, { value: 'AK', label: 'Alaska' }, { value: 'AS', label: 'American Samoa' }, { value: 'AZ', label: 'Arizona' }, { value: 'AR', label: 'Arkansas' }, { value: 'CA', label: 'California' }, { value: 'CO', label: 'Colorado' }, { value: 'CT', label: 'Connecticut' }, { value: 'DE', label: 'Delaware' }, { value: 'DC', label: 'District Of Columbia' }, { value: 'FM', label: 'Federated States Of Micronesia' }, { value: 'FL', label: 'Florida' }, { value: 'GA', label: 'Georgia' }, { value: 'GU', label: 'Guam' }, { value: 'HI', label: 'Hawaii' }, { value: 'ID', label: 'Idaho' }, { value: 'IL', label: 'Illinois' }, { value: 'IN', label: 'Indiana' }, { value: 'IA', label: 'Iowa' }, { value: 'KS', label: 'Kansas' }, { value: 'KY', label: 'Kentucky' }, { value: 'LA', label: 'Louisiana' }, { value: 'ME', label: 'Maine' }, { value: 'MH', label: 'Marshall Islands' }, { value: 'MD', label: 'Maryland' }, { value: 'MA', label: 'Massachusetts' }, { value: 'MI', label: 'Michigan' }, { value: 'MN', label: 'Minnesota' }, { value: 'MS', label: 'Mississippi' }, { value: 'MO', label: 'Missouri' }, { value: 'MT', label: 'Montana' }, { value: 'NE', label: 'Nebraska' }, { value: 'NV', label: 'Nevada' }, { value: 'NH', label: 'New Hampshire' }, { value: 'NJ', label: 'New Jersey' }, { value: 'NM', label: 'New Mexico' }, { value: 'NY', label: 'New York' }, { value: 'NC', label: 'North Carolina' }, { value: 'ND', label: 'North Dakota' }, { value: 'MP', label: 'Northern Mariana Islands' }, { value: 'OH', label: 'Ohio' }, { value: 'OK', label: 'Oklahoma' }, { value: 'OR', label: 'Oregon' }, { value: 'PW', label: 'Palau' }, { value: 'PA', label: 'Pennsylvania' }, { value: 'PR', label: 'Puerto Rico' }, { value: 'RI', label: 'Rhode Island' }, { value: 'SC', label: 'South Carolina' }, { value: 'SD', label: 'South Dakota' }, { value: 'TN', label: 'Tennessee' }, { value: 'TX', label: 'Texas' }, { value: 'UT', label: 'Utah' }, { value: 'VT', label: 'Vermont' }, { value: 'VI', label: 'Virgin Islands' }, { value: 'VA', label: 'Virginia' }, { value: 'WA', label: 'Washington' }, { value: 'WV', label: 'West Virginia' }, { value: 'WI', label: 'Wisconsin' }, { value: 'WY', label: 'Wyoming' }];
+
+},{}],10:[function(require,module,exports){
+'use strict';
+
+module.exports = [{ value: 'John Smith', label: 'John Smith', email: 'john@smith.com' }, { value: 'Merry Jane', label: 'Merry Jane', email: 'merry@jane.com' }, { value: 'Stan Hoper', label: 'Stan Hoper', email: 'stan@hoper.com' }];
+
+},{}],11:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -84,7 +833,7 @@ var isArray = Array.isArray || function (xs) {
   return Object.prototype.toString.call(xs) === '[object Array]';
 };
 
-},{}],2:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -171,945 +920,14 @@ var objectKeys = Object.keys || function (obj) {
   return res;
 };
 
-},{}],3:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 'use strict';
 
 exports.decode = exports.parse = require('./decode');
 exports.encode = exports.stringify = require('./encode');
 
-},{"./decode":1,"./encode":2}],4:[function(require,module,exports){
-/* eslint react/prop-types: 0 */
-
-'use strict';
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-
-var _react = require('react');
-
-var _react2 = _interopRequireDefault(_react);
-
-var _reactSelect = require('react-select');
-
-var _reactSelect2 = _interopRequireDefault(_reactSelect);
-
-var _componentsCustomKeysField = require('./components/CustomKeysField');
-
-var _componentsCustomKeysField2 = _interopRequireDefault(_componentsCustomKeysField);
-
-var _componentsCustomRenderField = require('./components/CustomRenderField');
-
-var _componentsCustomRenderField2 = _interopRequireDefault(_componentsCustomRenderField);
-
-var _componentsDisabledUpsellOptions = require('./components/DisabledUpsellOptions');
-
-var _componentsDisabledUpsellOptions2 = _interopRequireDefault(_componentsDisabledUpsellOptions);
-
-var _componentsMultiSelectField = require('./components/MultiSelectField');
-
-var _componentsMultiSelectField2 = _interopRequireDefault(_componentsMultiSelectField);
-
-var _componentsRemoteSelectField = require('./components/RemoteSelectField');
-
-var _componentsRemoteSelectField2 = _interopRequireDefault(_componentsRemoteSelectField);
-
-var _componentsSelectedValuesField = require('./components/SelectedValuesField');
-
-var _componentsSelectedValuesField2 = _interopRequireDefault(_componentsSelectedValuesField);
-
-var _componentsStatesField = require('./components/StatesField');
-
-var _componentsStatesField2 = _interopRequireDefault(_componentsStatesField);
-
-var _componentsUsersField = require('./components/UsersField');
-
-var _componentsUsersField2 = _interopRequireDefault(_componentsUsersField);
-
-var _componentsValuesAsNumbersField = require('./components/ValuesAsNumbersField');
-
-var _componentsValuesAsNumbersField2 = _interopRequireDefault(_componentsValuesAsNumbersField);
-
-var FLAVOURS = [{ label: 'Chocolate', value: 'chocolate' }, { label: 'Vanilla', value: 'vanilla' }, { label: 'Strawberry', value: 'strawberry' }, { label: 'Cookies and Cream', value: 'cookiescream' }, { label: 'Peppermint', value: 'peppermint' }];
-var FLAVOURS_WITH_DISABLED_OPTION = FLAVOURS.slice(0);
-FLAVOURS_WITH_DISABLED_OPTION.unshift({ label: 'Caramel (You don\'t like it, apparently)', value: 'caramel', disabled: true });
-
-function logChange() {
-	console.log.apply(console, [].concat(['Select value changed:'], Array.prototype.slice.apply(arguments)));
-}
-
-_react2['default'].render(_react2['default'].createElement(
-	'div',
-	null,
-	_react2['default'].createElement(_componentsStatesField2['default'], { label: 'States', searchable: true }),
-	_react2['default'].createElement(_componentsMultiSelectField2['default'], { label: 'Multiselect' }),
-	_react2['default'].createElement(_componentsUsersField2['default'], { label: 'Users (custom options/value)', hint: 'This example uses Gravatar to render user\'s image besides the value and the options' }),
-	_react2['default'].createElement(_componentsValuesAsNumbersField2['default'], { label: 'Values as numbers' }),
-	_react2['default'].createElement(_componentsCustomKeysField2['default'], { label: 'Custom object keys for options' }),
-	_react2['default'].createElement(_componentsSelectedValuesField2['default'], { label: 'Clickable labels (labels as links)', options: FLAVOURS, hint: 'Open the console to see click behaviour (data/event)' }),
-	_react2['default'].createElement(_componentsSelectedValuesField2['default'], { label: 'Disabled option', options: FLAVOURS_WITH_DISABLED_OPTION, hint: 'You savage! Caramel is the best...' }),
-	_react2['default'].createElement(_componentsDisabledUpsellOptions2['default'], { label: 'Disabled option with a link' }),
-	_react2['default'].createElement(_componentsSelectedValuesField2['default'], { label: 'Option Creation (tags mode)', options: FLAVOURS, allowCreate: true, hint: 'Enter a value that\'s not in the list, then hit enter' }),
-	_react2['default'].createElement(_componentsCustomRenderField2['default'], { label: 'Custom render options/values' }),
-	_react2['default'].createElement(_componentsCustomRenderField2['default'], { label: 'Custom render options/values (multi)', multi: true, delimiter: ',' }),
-	_react2['default'].createElement(_componentsRemoteSelectField2['default'], { label: 'Remote Options', hint: 'Type anything in the remote example to asynchronously load options. Valid alternative results are "A", "AA", and "AB"' })
-), document.getElementById('example'));
-
-},{"./components/CustomKeysField":5,"./components/CustomRenderField":7,"./components/DisabledUpsellOptions":9,"./components/MultiSelectField":10,"./components/RemoteSelectField":11,"./components/SelectedValuesField":12,"./components/StatesField":13,"./components/UsersField":14,"./components/ValuesAsNumbersField":15,"react":undefined,"react-select":undefined}],5:[function(require,module,exports){
-'use strict';
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-
-var _react = require('react');
-
-var _react2 = _interopRequireDefault(_react);
-
-var _reactSelect = require('react-select');
-
-var _reactSelect2 = _interopRequireDefault(_reactSelect);
-
-function logChange() {
-	console.log.apply(console, [].concat(['Select value changed:'], Array.prototype.slice.apply(arguments)));
-}
-
-var CustomKeysField = _react2['default'].createClass({
-	displayName: 'CustomKeysField',
-	propTypes: {
-		label: _react2['default'].PropTypes.string
-	},
-
-	getInitialState: function getInitialState() {
-		return {
-			options: [{ id: '1', name: 'One' }, { id: '2', name: 'Two' }, { id: '3', name: 'Three' }, { id: '4', name: 'Four' }],
-			value: null,
-			multi: false
-		};
-	},
-
-	onChange: function onChange(value, values) {
-		this.setState({
-			value: value
-		});
-		logChange(value, values);
-	},
-
-	onChangeMulti: function onChangeMulti(event) {
-		this.setState({
-			multi: event.target.checked
-		});
-	},
-
-	render: function render() {
-		return _react2['default'].createElement(
-			'div',
-			{ className: 'section' },
-			_react2['default'].createElement(
-				'h3',
-				{ className: 'section-heading' },
-				this.props.label
-			),
-			_react2['default'].createElement(_reactSelect2['default'], {
-				searchable: true,
-				labelKey: 'name',
-				valueKey: 'id',
-				options: this.state.options,
-				onChange: this.onChange,
-				value: this.state.value,
-				multi: this.state.multi
-			}),
-			_react2['default'].createElement(
-				'div',
-				{ className: 'checkbox-list' },
-				_react2['default'].createElement(
-					'label',
-					{ className: 'checkbox' },
-					_react2['default'].createElement('input', { type: 'checkbox', className: 'checkbox-control', checked: this.state.multi, onChange: this.onChangeMulti }),
-					_react2['default'].createElement(
-						'span',
-						{ className: 'checkbox-label' },
-						'Multi-Select'
-					)
-				)
-			)
-		);
-	}
-});
-
-module.exports = CustomKeysField;
-
-},{"react":undefined,"react-select":undefined}],6:[function(require,module,exports){
-'use strict';
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-
-var _react = require('react');
-
-var _react2 = _interopRequireDefault(_react);
-
-var _reactGravatar = require('react-gravatar');
-
-var _reactGravatar2 = _interopRequireDefault(_reactGravatar);
-
-var Option = _react2['default'].createClass({
-	displayName: 'Option',
-
-	propTypes: {
-		addLabelText: _react2['default'].PropTypes.string,
-		className: _react2['default'].PropTypes.string,
-		mouseDown: _react2['default'].PropTypes.func,
-		mouseEnter: _react2['default'].PropTypes.func,
-		mouseLeave: _react2['default'].PropTypes.func,
-		option: _react2['default'].PropTypes.object.isRequired,
-		renderFunc: _react2['default'].PropTypes.func
-	},
-	render: function render() {
-		var obj = this.props.option;
-		var size = 15;
-		var gravatarStyle = {
-			borderRadius: 3,
-			display: 'inline-block',
-			marginRight: 10,
-			position: 'relative',
-			top: -2,
-			verticalAlign: 'middle'
-		};
-		return _react2['default'].createElement(
-			'div',
-			{ className: this.props.className,
-				onMouseEnter: this.props.mouseEnter,
-				onMouseLeave: this.props.mouseLeave,
-				onMouseDown: this.props.mouseDown,
-				onClick: this.props.mouseDown },
-			_react2['default'].createElement(_reactGravatar2['default'], { email: obj.email, size: size, style: gravatarStyle }),
-			obj.value
-		);
-	}
-});
-
-module.exports = Option;
-
-},{"react":undefined,"react-gravatar":18}],7:[function(require,module,exports){
-'use strict';
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-
-var _react = require('react');
-
-var _react2 = _interopRequireDefault(_react);
-
-var _reactSelect = require('react-select');
-
-var _reactSelect2 = _interopRequireDefault(_reactSelect);
-
-function logChange() {
-	console.log.apply(console, [].concat(['Select value changed:'], Array.prototype.slice.apply(arguments)));
-}
-
-var CustomRenderField = _react2['default'].createClass({
-	displayName: 'CustomRenderField',
-	propTypes: {
-		delimiter: _react2['default'].PropTypes.string,
-		label: _react2['default'].PropTypes.string,
-		multi: _react2['default'].PropTypes.bool
-	},
-	renderOption: function renderOption(option) {
-		return _react2['default'].createElement(
-			'span',
-			{ style: { color: option.hex } },
-			option.label,
-			' (',
-			option.hex,
-			')'
-		);
-	},
-	renderValue: function renderValue(option) {
-		return _react2['default'].createElement(
-			'strong',
-			{ style: { color: option.hex } },
-			option.label
-		);
-	},
-	render: function render() {
-		var ops = [{ label: 'Red', value: 'red', hex: '#EC6230' }, { label: 'Green', value: 'green', hex: '#4ED84E' }, { label: 'Blue', value: 'blue', hex: '#6D97E2' }];
-		return _react2['default'].createElement(
-			'div',
-			{ className: 'section' },
-			_react2['default'].createElement(
-				'h3',
-				{ className: 'section-heading' },
-				this.props.label
-			),
-			_react2['default'].createElement(_reactSelect2['default'], {
-				delimiter: this.props.delimiter,
-				multi: this.props.multi,
-				allowCreate: true,
-				placeholder: 'Select your favourite',
-				options: ops,
-				optionRenderer: this.renderOption,
-				valueRenderer: this.renderValue,
-				onChange: logChange })
-		);
-	}
-});
-
-module.exports = CustomRenderField;
-
-},{"react":undefined,"react-select":undefined}],8:[function(require,module,exports){
-'use strict';
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-
-var _react = require('react');
-
-var _react2 = _interopRequireDefault(_react);
-
-var _reactGravatar = require('react-gravatar');
-
-var _reactGravatar2 = _interopRequireDefault(_reactGravatar);
-
-var SingleValue = _react2['default'].createClass({
-	displayName: 'SingleValue',
-
-	propTypes: {
-		placeholder: _react2['default'].PropTypes.string,
-		value: _react2['default'].PropTypes.object
-	},
-	render: function render() {
-		var obj = this.props.value;
-		var size = 15;
-		var gravatarStyle = {
-			borderRadius: 3,
-			display: 'inline-block',
-			marginRight: 10,
-			position: 'relative',
-			top: -2,
-			verticalAlign: 'middle'
-		};
-
-		return _react2['default'].createElement(
-			'div',
-			{ className: 'Select-placeholder' },
-			obj ? _react2['default'].createElement(
-				'div',
-				null,
-				_react2['default'].createElement(_reactGravatar2['default'], { email: obj.email, size: size, style: gravatarStyle }),
-				obj.value
-			) : this.props.placeholder
-		);
-	}
-});
-
-module.exports = SingleValue;
-
-},{"react":undefined,"react-gravatar":18}],9:[function(require,module,exports){
-'use strict';
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-
-var _react = require('react');
-
-var _react2 = _interopRequireDefault(_react);
-
-var _reactSelect = require('react-select');
-
-var _reactSelect2 = _interopRequireDefault(_reactSelect);
-
-function logChange() {
-	console.log.apply(console, [].concat(['Select value changed:'], Array.prototype.slice.apply(arguments)));
-}
-
-var DisabledUpsellOptions = _react2['default'].createClass({
-	displayName: 'DisabledUpsellOptions',
-	propTypes: {
-		label: _react2['default'].PropTypes.string
-	},
-	onLabelClick: function onLabelClick(data, event) {
-		console.log(data, event);
-	},
-	renderLink: function renderLink() {
-		return _react2['default'].createElement(
-			'a',
-			{ style: { marginLeft: 5 }, href: '/upgrade', target: '_blank' },
-			'Upgrade here!'
-		);
-	},
-	renderOption: function renderOption(option) {
-		return _react2['default'].createElement(
-			'span',
-			null,
-			option.label,
-			' ',
-			option.link,
-			' '
-		);
-	},
-	render: function render() {
-		var ops = [{ label: 'Basic customer support', value: 'basic' }, { label: 'Premium customer support', value: 'premium' }, { label: 'Pro customer support', value: 'pro', disabled: true, link: this.renderLink() }];
-		return _react2['default'].createElement(
-			'div',
-			{ className: 'section' },
-			_react2['default'].createElement(
-				'h3',
-				{ className: 'section-heading' },
-				this.props.label
-			),
-			_react2['default'].createElement(_reactSelect2['default'], {
-				onOptionLabelClick: this.onLabelClick,
-				placeholder: 'Select your support level',
-				options: ops,
-				optionRenderer: this.renderOption,
-				onChange: logChange })
-		);
-	}
-});
-module.exports = DisabledUpsellOptions;
-
-},{"react":undefined,"react-select":undefined}],10:[function(require,module,exports){
-'use strict';
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-
-var _react = require('react');
-
-var _react2 = _interopRequireDefault(_react);
-
-var _reactSelect = require('react-select');
-
-var _reactSelect2 = _interopRequireDefault(_reactSelect);
-
-function logChange() {
-	console.log.apply(console, [].concat(['Select value changed:'], Array.prototype.slice.apply(arguments)));
-}
-
-var MultiSelectField = _react2['default'].createClass({
-	displayName: 'MultiSelectField',
-	propTypes: {
-		label: _react2['default'].PropTypes.string
-	},
-	getInitialState: function getInitialState() {
-		return {
-			disabled: false,
-			value: []
-		};
-	},
-	handleSelectChange: function handleSelectChange(value, values) {
-		logChange('New value:', value, 'Values:', values);
-		this.setState({ value: value });
-	},
-	toggleDisabled: function toggleDisabled(e) {
-		this.setState({ 'disabled': e.target.checked });
-	},
-	render: function render() {
-		var ops = [{ label: 'Chocolate', value: 'chocolate' }, { label: 'Vanilla', value: 'vanilla' }, { label: 'Strawberry', value: 'strawberry' }, { label: 'Caramel', value: 'caramel' }, { label: 'Cookies and Cream', value: 'cookiescream' }, { label: 'Peppermint', value: 'peppermint' }];
-		return _react2['default'].createElement(
-			'div',
-			{ className: 'section' },
-			_react2['default'].createElement(
-				'h3',
-				{ className: 'section-heading' },
-				this.props.label
-			),
-			_react2['default'].createElement(_reactSelect2['default'], { multi: true, disabled: this.state.disabled, value: this.state.value, placeholder: 'Select your favourite(s)', options: ops, onChange: this.handleSelectChange }),
-			_react2['default'].createElement(
-				'div',
-				{ className: 'checkbox-list' },
-				_react2['default'].createElement(
-					'label',
-					{ className: 'checkbox' },
-					_react2['default'].createElement('input', { type: 'checkbox', className: 'checkbox-control', checked: this.state.disabled, onChange: this.toggleDisabled }),
-					_react2['default'].createElement(
-						'span',
-						{ className: 'checkbox-label' },
-						'Disabled'
-					)
-				)
-			)
-		);
-	}
-});
-
-module.exports = MultiSelectField;
-
-},{"react":undefined,"react-select":undefined}],11:[function(require,module,exports){
-'use strict';
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-
-var _react = require('react');
-
-var _react2 = _interopRequireDefault(_react);
-
-var _reactSelect = require('react-select');
-
-var _reactSelect2 = _interopRequireDefault(_reactSelect);
-
-var RemoteSelectField = _react2['default'].createClass({
-	displayName: 'RemoteSelectField',
-	propTypes: {
-		hint: _react2['default'].PropTypes.string,
-		label: _react2['default'].PropTypes.string
-	},
-	loadOptions: function loadOptions(input, callback) {
-		input = input.toLowerCase();
-		var rtn = {
-			options: [{ label: 'One', value: 'one' }, { label: 'Two', value: 'two' }, { label: 'Three', value: 'three' }],
-			complete: true
-		};
-		if (input.slice(0, 1) === 'a') {
-			if (input.slice(0, 2) === 'ab') {
-				rtn = {
-					options: [{ label: 'AB', value: 'ab' }, { label: 'ABC', value: 'abc' }, { label: 'ABCD', value: 'abcd' }],
-					complete: true
-				};
-			} else {
-				rtn = {
-					options: [{ label: 'A', value: 'a' }, { label: 'AA', value: 'aa' }, { label: 'AB', value: 'ab' }],
-					complete: false
-				};
-			}
-		} else if (!input.length) {
-			rtn.complete = false;
-		}
-
-		setTimeout(function () {
-			callback(null, rtn);
-		}, 500);
-	},
-	renderHint: function renderHint() {
-		if (!this.props.hint) return null;
-		return _react2['default'].createElement(
-			'div',
-			{ className: 'hint' },
-			this.props.hint
-		);
-	},
-	render: function render() {
-		return _react2['default'].createElement(
-			'div',
-			{ className: 'section' },
-			_react2['default'].createElement(
-				'h3',
-				{ className: 'section-heading' },
-				this.props.label
-			),
-			_react2['default'].createElement(_reactSelect2['default'], { asyncOptions: this.loadOptions, className: 'remote-example' }),
-			this.renderHint()
-		);
-	}
-});
-
-module.exports = RemoteSelectField;
-
-},{"react":undefined,"react-select":undefined}],12:[function(require,module,exports){
-'use strict';
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-
-var _react = require('react');
-
-var _react2 = _interopRequireDefault(_react);
-
-var _reactSelect = require('react-select');
-
-var _reactSelect2 = _interopRequireDefault(_reactSelect);
-
-function logChange() {
-	console.log.apply(console, [].concat(['Select value changed:'], Array.prototype.slice.apply(arguments)));
-}
-
-var SelectedValuesField = _react2['default'].createClass({
-	displayName: 'SelectedValuesField',
-	propTypes: {
-		allowCreate: _react2['default'].PropTypes.bool,
-		hint: _react2['default'].PropTypes.string,
-		label: _react2['default'].PropTypes.string,
-		options: _react2['default'].PropTypes.array
-	},
-	onLabelClick: function onLabelClick(data, event) {
-		console.log(data, event);
-	},
-	renderHint: function renderHint() {
-		if (!this.props.hint) return null;
-		return _react2['default'].createElement(
-			'div',
-			{ className: 'hint' },
-			this.props.hint
-		);
-	},
-	render: function render() {
-		return _react2['default'].createElement(
-			'div',
-			{ className: 'section' },
-			_react2['default'].createElement(
-				'h3',
-				{ className: 'section-heading' },
-				this.props.label
-			),
-			_react2['default'].createElement(_reactSelect2['default'], {
-				allowCreate: this.props.allowCreate,
-				onOptionLabelClick: this.onLabelClick,
-				value: this.props.options.slice(1, 3),
-				multi: true,
-				placeholder: 'Select your favourite(s)',
-				options: this.props.options,
-				onChange: logChange }),
-			this.renderHint()
-		);
-	}
-});
-
-module.exports = SelectedValuesField;
-
-},{"react":undefined,"react-select":undefined}],13:[function(require,module,exports){
-'use strict';
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-
-var _react = require('react');
-
-var _react2 = _interopRequireDefault(_react);
-
-var _reactSelect = require('react-select');
-
-var _reactSelect2 = _interopRequireDefault(_reactSelect);
-
-var STATES = require('../data/states');
-var id = 0;
-
-function logChange() {
-	console.log.apply(console, [].concat(['Select value changed:'], Array.prototype.slice.apply(arguments)));
-}
-
-var StatesField = _react2['default'].createClass({
-	displayName: 'StatesField',
-	propTypes: {
-		label: _react2['default'].PropTypes.string,
-		searchable: _react2['default'].PropTypes.bool
-	},
-	getDefaultProps: function getDefaultProps() {
-		return {
-			label: 'States:',
-			searchable: true
-		};
-	},
-	getInitialState: function getInitialState() {
-		return {
-			country: 'AU',
-			disabled: false,
-			searchable: this.props.searchable,
-			id: ++id,
-			selectValue: 'new-south-wales'
-		};
-	},
-	switchCountry: function switchCountry(e) {
-		var newCountry = e.target.value;
-		console.log('Country changed to ' + newCountry);
-		this.setState({
-			country: newCountry,
-			selectValue: null
-		});
-	},
-	updateValue: function updateValue(newValue) {
-		logChange('State changed to ' + newValue);
-		this.setState({
-			selectValue: newValue || null
-		});
-	},
-	focusStateSelect: function focusStateSelect() {
-		this.refs.stateSelect.focus();
-	},
-	toggleCheckbox: function toggleCheckbox(e) {
-		var newState = {};
-		newState[e.target.name] = e.target.checked;
-		this.setState(newState);
-	},
-	render: function render() {
-		var ops = STATES[this.state.country];
-		return _react2['default'].createElement(
-			'div',
-			{ className: 'section' },
-			_react2['default'].createElement(
-				'h3',
-				{ className: 'section-heading' },
-				this.props.label
-			),
-			_react2['default'].createElement(_reactSelect2['default'], { ref: 'stateSelect', options: ops, disabled: this.state.disabled, value: this.state.selectValue, onChange: this.updateValue, searchable: this.state.searchable }),
-			_react2['default'].createElement(
-				'div',
-				{ style: { marginTop: 14 } },
-				_react2['default'].createElement(
-					'button',
-					{ type: 'button', onClick: this.focusStateSelect },
-					'Focus Select'
-				),
-				_react2['default'].createElement(
-					'label',
-					{ className: 'checkbox', style: { marginLeft: 10 } },
-					_react2['default'].createElement('input', { type: 'checkbox', className: 'checkbox-control', name: 'searchable', checked: this.state.searchable, onChange: this.toggleCheckbox }),
-					_react2['default'].createElement(
-						'span',
-						{ className: 'checkbox-label' },
-						'Searchable'
-					)
-				),
-				_react2['default'].createElement(
-					'label',
-					{ className: 'checkbox', style: { marginLeft: 10 } },
-					_react2['default'].createElement('input', { type: 'checkbox', className: 'checkbox-control', name: 'disabled', checked: this.state.disabled, onChange: this.toggleCheckbox }),
-					_react2['default'].createElement(
-						'span',
-						{ className: 'checkbox-label' },
-						'Disabled'
-					)
-				)
-			),
-			_react2['default'].createElement(
-				'div',
-				{ className: 'checkbox-list' },
-				_react2['default'].createElement(
-					'label',
-					{ className: 'checkbox' },
-					_react2['default'].createElement('input', { type: 'radio', className: 'checkbox-control', checked: this.state.country === 'AU', value: 'AU', onChange: this.switchCountry }),
-					_react2['default'].createElement(
-						'span',
-						{ className: 'checkbox-label' },
-						'Australia'
-					)
-				),
-				_react2['default'].createElement(
-					'label',
-					{ className: 'checkbox' },
-					_react2['default'].createElement('input', { type: 'radio', className: 'checkbox-control', checked: this.state.country === 'US', value: 'US', onChange: this.switchCountry }),
-					_react2['default'].createElement(
-						'span',
-						{ className: 'checkbox-label' },
-						'United States'
-					)
-				)
-			)
-		);
-	}
-});
-
-module.exports = StatesField;
-
-},{"../data/states":16,"react":undefined,"react-select":undefined}],14:[function(require,module,exports){
-'use strict';
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-
-var _CustomOption = require('./CustomOption');
-
-var _CustomOption2 = _interopRequireDefault(_CustomOption);
-
-var _CustomSingleValue = require('./CustomSingleValue');
-
-var _CustomSingleValue2 = _interopRequireDefault(_CustomSingleValue);
-
-var _react = require('react');
-
-var _react2 = _interopRequireDefault(_react);
-
-var _reactSelect = require('react-select');
-
-var _reactSelect2 = _interopRequireDefault(_reactSelect);
-
-var USERS = require('../data/users');
-
-var UsersField = _react2['default'].createClass({
-	displayName: 'UsersField',
-
-	propTypes: {
-		hint: _react2['default'].PropTypes.string,
-		label: _react2['default'].PropTypes.string
-	},
-	renderHint: function renderHint() {
-		if (!this.props.hint) return null;
-		return _react2['default'].createElement(
-			'div',
-			{ className: 'hint' },
-			this.props.hint
-		);
-	},
-	render: function render() {
-
-		return _react2['default'].createElement(
-			'div',
-			{ className: 'section' },
-			_react2['default'].createElement(
-				'h3',
-				{ className: 'section-heading' },
-				this.props.label
-			),
-			_react2['default'].createElement(_reactSelect2['default'], {
-				onOptionLabelClick: this.onLabelClick,
-				placeholder: 'Select user',
-				optionComponent: _CustomOption2['default'],
-				singleValueComponent: _CustomSingleValue2['default'],
-				options: USERS.users }),
-			this.renderHint()
-		);
-	}
-});
-
-module.exports = UsersField;
-
-},{"../data/users":17,"./CustomOption":6,"./CustomSingleValue":8,"react":undefined,"react-select":undefined}],15:[function(require,module,exports){
-'use strict';
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-
-var _react = require('react');
-
-var _react2 = _interopRequireDefault(_react);
-
-var _reactSelect = require('react-select');
-
-var _reactSelect2 = _interopRequireDefault(_reactSelect);
-
-function logChange() {
-	console.log.apply(console, [].concat(['Select value changed:'], Array.prototype.slice.apply(arguments)));
-}
-
-var ValuesAsNumbersField = _react2['default'].createClass({
-	displayName: 'ValuesAsNumbersField',
-	propTypes: {
-		label: _react2['default'].PropTypes.string
-	},
-
-	getInitialState: function getInitialState() {
-		return {
-			options: [{ value: 10, label: 'Ten' }, { value: 11, label: 'Eleven' }, { value: 12, label: 'Twelve' }, { value: 23, label: 'Twenty-three' }, { value: 24, label: 'Twenty-four' }],
-			matchPos: 'any',
-			matchValue: true,
-			matchLabel: true,
-			value: null,
-			multi: false
-		};
-	},
-
-	onChangeMatchStart: function onChangeMatchStart(event) {
-		this.setState({
-			matchPos: event.target.checked ? 'start' : 'any'
-		});
-	},
-
-	onChangeMatchValue: function onChangeMatchValue(event) {
-		this.setState({
-			matchValue: event.target.checked
-		});
-	},
-
-	onChangeMatchLabel: function onChangeMatchLabel(event) {
-		this.setState({
-			matchLabel: event.target.checked
-		});
-	},
-
-	onChange: function onChange(value, values) {
-		this.setState({
-			value: value
-		});
-		logChange(value, values);
-	},
-
-	onChangeMulti: function onChangeMulti(event) {
-		this.setState({
-			multi: event.target.checked
-		});
-	},
-
-	render: function render() {
-
-		var matchProp = 'any';
-
-		if (this.state.matchLabel && !this.state.matchValue) {
-			matchProp = 'label';
-		}
-
-		if (!this.state.matchLabel && this.state.matchValue) {
-			matchProp = 'value';
-		}
-
-		return _react2['default'].createElement(
-			'div',
-			{ className: 'section' },
-			_react2['default'].createElement(
-				'h3',
-				{ className: 'section-heading' },
-				this.props.label
-			),
-			_react2['default'].createElement(_reactSelect2['default'], {
-				searchable: true,
-				matchProp: matchProp,
-				matchPos: this.state.matchPos,
-				options: this.state.options,
-				onChange: this.onChange,
-				value: this.state.value,
-				multi: this.state.multi
-			}),
-			_react2['default'].createElement(
-				'div',
-				{ className: 'checkbox-list' },
-				_react2['default'].createElement(
-					'label',
-					{ className: 'checkbox' },
-					_react2['default'].createElement('input', { type: 'checkbox', className: 'checkbox-control', checked: this.state.multi, onChange: this.onChangeMulti }),
-					_react2['default'].createElement(
-						'span',
-						{ className: 'checkbox-label' },
-						'Multi-Select'
-					)
-				),
-				_react2['default'].createElement(
-					'label',
-					{ className: 'checkbox' },
-					_react2['default'].createElement('input', { type: 'checkbox', className: 'checkbox-control', checked: this.state.matchValue, onChange: this.onChangeMatchValue }),
-					_react2['default'].createElement(
-						'span',
-						{ className: 'checkbox-label' },
-						'Match value only'
-					)
-				),
-				_react2['default'].createElement(
-					'label',
-					{ className: 'checkbox' },
-					_react2['default'].createElement('input', { type: 'checkbox', className: 'checkbox-control', checked: this.state.matchLabel, onChange: this.onChangeMatchLabel }),
-					_react2['default'].createElement(
-						'span',
-						{ className: 'checkbox-label' },
-						'Match label only'
-					)
-				),
-				_react2['default'].createElement(
-					'label',
-					{ className: 'checkbox' },
-					_react2['default'].createElement('input', { type: 'checkbox', className: 'checkbox-control', checked: this.state.matchPos === 'start', onChange: this.onChangeMatchStart }),
-					_react2['default'].createElement(
-						'span',
-						{ className: 'checkbox-label' },
-						'Only include matches from the start of the string'
-					)
-				)
-			)
-		);
-	}
-});
-
-module.exports = ValuesAsNumbersField;
-
-},{"react":undefined,"react-select":undefined}],16:[function(require,module,exports){
-'use strict';
-
-exports.AU = [{ value: 'australian-capital-territory', label: 'Australian Capital Territory' }, { value: 'new-south-wales', label: 'New South Wales' }, { value: 'victoria', label: 'Victoria' }, { value: 'queensland', label: 'Queensland' }, { value: 'western-australia', label: 'Western Australia' }, { value: 'south-australia', label: 'South Australia' }, { value: 'tasmania', label: 'Tasmania' }, { value: 'northern-territory', label: 'Northern Territory' }];
-
-exports.US = [{ value: 'AL', label: 'Alabama', disabled: true }, { value: 'AK', label: 'Alaska' }, { value: 'AS', label: 'American Samoa' }, { value: 'AZ', label: 'Arizona' }, { value: 'AR', label: 'Arkansas' }, { value: 'CA', label: 'California' }, { value: 'CO', label: 'Colorado' }, { value: 'CT', label: 'Connecticut' }, { value: 'DE', label: 'Delaware' }, { value: 'DC', label: 'District Of Columbia' }, { value: 'FM', label: 'Federated States Of Micronesia' }, { value: 'FL', label: 'Florida' }, { value: 'GA', label: 'Georgia' }, { value: 'GU', label: 'Guam' }, { value: 'HI', label: 'Hawaii' }, { value: 'ID', label: 'Idaho' }, { value: 'IL', label: 'Illinois' }, { value: 'IN', label: 'Indiana' }, { value: 'IA', label: 'Iowa' }, { value: 'KS', label: 'Kansas' }, { value: 'KY', label: 'Kentucky' }, { value: 'LA', label: 'Louisiana' }, { value: 'ME', label: 'Maine' }, { value: 'MH', label: 'Marshall Islands' }, { value: 'MD', label: 'Maryland' }, { value: 'MA', label: 'Massachusetts' }, { value: 'MI', label: 'Michigan' }, { value: 'MN', label: 'Minnesota' }, { value: 'MS', label: 'Mississippi' }, { value: 'MO', label: 'Missouri' }, { value: 'MT', label: 'Montana' }, { value: 'NE', label: 'Nebraska' }, { value: 'NV', label: 'Nevada' }, { value: 'NH', label: 'New Hampshire' }, { value: 'NJ', label: 'New Jersey' }, { value: 'NM', label: 'New Mexico' }, { value: 'NY', label: 'New York' }, { value: 'NC', label: 'North Carolina' }, { value: 'ND', label: 'North Dakota' }, { value: 'MP', label: 'Northern Mariana Islands' }, { value: 'OH', label: 'Ohio' }, { value: 'OK', label: 'Oklahoma' }, { value: 'OR', label: 'Oregon' }, { value: 'PW', label: 'Palau' }, { value: 'PA', label: 'Pennsylvania' }, { value: 'PR', label: 'Puerto Rico' }, { value: 'RI', label: 'Rhode Island' }, { value: 'SC', label: 'South Carolina' }, { value: 'SD', label: 'South Dakota' }, { value: 'TN', label: 'Tennessee' }, { value: 'TX', label: 'Texas' }, { value: 'UT', label: 'Utah' }, { value: 'VT', label: 'Vermont' }, { value: 'VI', label: 'Virgin Islands' }, { value: 'VA', label: 'Virginia' }, { value: 'WA', label: 'Washington' }, { value: 'WV', label: 'West Virginia' }, { value: 'WI', label: 'Wisconsin' }, { value: 'WY', label: 'Wyoming' }];
-
-},{}],17:[function(require,module,exports){
-'use strict';
-
-exports.users = [{ value: 'John Smith', label: 'John Smith', email: 'john@smith.com' }, { value: 'Merry Jane', label: 'Merry Jane', email: 'merry@jane.com' }, { value: 'Stan Hoper', label: 'Stan Hoper', email: 'stan@hoper.com' }];
-
-},{}],18:[function(require,module,exports){
-// Generated by CoffeeScript 1.9.3
+},{"./decode":11,"./encode":12}],14:[function(require,module,exports){
+// Generated by CoffeeScript 1.10.0
 var React, isRetina, md5, querystring;
 
 React = require('react');
@@ -1123,7 +941,8 @@ isRetina = require('is-retina');
 module.exports = React.createClass({
   displayName: 'Gravatar',
   propTypes: {
-    email: React.PropTypes.string.isRequired,
+    email: React.PropTypes.string,
+    md5: React.PropTypes.string,
     size: React.PropTypes.number,
     rating: React.PropTypes.string,
     https: React.PropTypes.bool,
@@ -1136,29 +955,58 @@ module.exports = React.createClass({
       rating: 'g',
       https: false,
       "default": "retro",
-      email: '',
       className: ""
     };
   },
   render: function() {
-    var base, query, src;
+    var base, hash, modernBrowser, query, retinaQuery, retinaSrc, src;
     base = this.props.https ? "https://secure.gravatar.com/avatar/" : 'http://www.gravatar.com/avatar/';
     query = querystring.stringify({
-      s: isRetina() ? this.props.size * 2 : this.props.size,
+      s: this.props.size,
       r: this.props.rating,
       d: this.props["default"]
     });
-    src = base + md5(this.props.email) + "?" + query;
-    return React.createElement("img", React.__spread({}, this.props, {
-      "className": "react-gravatar " + this.props.className,
-      "src": src,
-      "height": this.props.size,
-      "width": this.props.size
-    }));
+    retinaQuery = querystring.stringify({
+      s: this.props.size * 2,
+      r: this.props.rating,
+      d: this.props["default"]
+    });
+    if (this.props.md5) {
+      hash = this.props.md5;
+    } else if (this.props.email) {
+      hash = md5(this.props.email);
+    } else {
+      console.warn('Gravatar image can not be fetched. Either the "email" or "md5" prop must be specified.');
+      return React.createElement("script", null);
+    }
+    src = base + hash + "?" + query;
+    retinaSrc = base + hash + "?" + retinaQuery;
+    modernBrowser = true;
+    if (typeof window !== "undefined" && window !== null) {
+      modernBrowser = 'srcset' in document.createElement('img');
+    }
+    if (!modernBrowser && isRetina()) {
+      return React.createElement("img", React.__spread({
+        "style": this.props.style,
+        "className": "react-gravatar " + this.props.className,
+        "src": retinaSrc,
+        "height": this.props.size,
+        "width": this.props.size
+      }, this.props));
+    } else {
+      return React.createElement("img", React.__spread({
+        "style": this.props.style,
+        "className": "react-gravatar " + this.props.className,
+        "src": src,
+        "srcSet": retinaSrc + " 2x",
+        "height": this.props.size,
+        "width": this.props.size
+      }, this.props));
+    }
   }
 });
 
-},{"is-retina":19,"md5":20,"querystring":3,"react":undefined}],19:[function(require,module,exports){
+},{"is-retina":15,"md5":16,"querystring":13,"react":undefined}],15:[function(require,module,exports){
 module.exports = function() {
   var mediaQuery;
   if (typeof window !== "undefined" && window !== null) {
@@ -1173,7 +1021,7 @@ module.exports = function() {
   return false;
 };
 
-},{}],20:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
 (function(){
   var crypt = require('crypt'),
       utf8 = require('charenc').utf8,
@@ -1335,7 +1183,7 @@ module.exports = function() {
 
 })();
 
-},{"charenc":21,"crypt":22,"is-buffer":23}],21:[function(require,module,exports){
+},{"charenc":17,"crypt":18,"is-buffer":19}],17:[function(require,module,exports){
 var charenc = {
   // UTF-8 encoding
   utf8: {
@@ -1370,7 +1218,7 @@ var charenc = {
 
 module.exports = charenc;
 
-},{}],22:[function(require,module,exports){
+},{}],18:[function(require,module,exports){
 (function() {
   var base64map
       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/',
@@ -1468,7 +1316,7 @@ module.exports = charenc;
   module.exports = crypt;
 })();
 
-},{}],23:[function(require,module,exports){
+},{}],19:[function(require,module,exports){
 /**
  * Determine if an object is Buffer
  *
@@ -1487,4 +1335,4 @@ module.exports = function (obj) {
   )
 }
 
-},{}]},{},[4]);
+},{}]},{},[1]);
